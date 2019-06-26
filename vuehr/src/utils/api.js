@@ -17,7 +17,7 @@ axios.interceptors.response.use(data => {
   return data;
 }, err => {
   if (err.response.status == 504 || err.response.status == 404) {
-    Message.error({message: '服务器被吃了⊙﹏⊙∥'});
+    Message.error({message: '服务器开小差了'});
   } else if (err.response.status == 403) {
     Message.error({message: '权限不足,请联系管理员!'});
   } else if (err.response.status == 401) {
@@ -31,7 +31,7 @@ axios.interceptors.response.use(data => {
   }
   // return Promise.resolve(err);
 })
-let base = '';
+let base = '/salary';
 export const postRequest = (url, params) => {
   return axios({
     method: 'post',

@@ -21,12 +21,13 @@ Vue.filter("formatDateTime", function formatDateTime(value) {
   var day = date.getDate();
   var hours = date.getHours();
   var minutes = date.getMinutes();
+  var seconds = date.getSeconds();
   if (month < 10) {
     month = "0" + month;
   }
   if (day < 10) {
     day = "0" + day;
   }
-  return year + "-" + month + "-" + day + " " + hours + ":" + minutes;
+  return year + "-" + month + "-" + day + " " + hours + ":" + minutes + ":" + seconds;
 });
 

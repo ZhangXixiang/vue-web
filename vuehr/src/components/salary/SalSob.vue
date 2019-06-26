@@ -2,7 +2,6 @@
   <div>
     <el-container>
       <el-header style="display: flex;justify-content: space-between;align-items: center;padding-left: 0px">
-        <el-button @click="dialogVisible = true" icon="el-icon-plus" type="primary" size="mini">添加账套</el-button>
         <el-button size="mini" type="success" @click="loadSalaryCfg" icon="el-icon-refresh"></el-button>
       </el-header>
       <el-main style="padding-left: 0px;padding-top: 0px">
@@ -19,94 +18,81 @@
               width="30">
             </el-table-column>
             <el-table-column
-              width="120"
-              prop="name"
-              label="账套名称">
+              width="140"
+              prop="title"
+              label="回答标题">
             </el-table-column>
             <el-table-column
               width="70"
-              prop="basicSalary"
-              label="基本工资">
+              prop="commentCount"
+              label="评论数">
             </el-table-column>
             <el-table-column
               width="70"
-              prop="trafficSalary"
-              label="交通补助">
+              prop="collectCount"
+              label="收藏数">
             </el-table-column>
             <el-table-column
               width="70"
-              prop="lunchSalary"
-              label="午餐补助">
+              prop="goodCount"
+              label="点赞数">
             </el-table-column>
             <el-table-column
-              prop="bonus"
+              prop="topName"
+              width="140"
+              label="所属话题">
+            </el-table-column>
+            <el-table-column
+              width="140"
+              label="发布时间">
+              <template slot-scope="scope">{{ scope.row.createTime | formatDateTime}}</template>
+            </el-table-column>
+            <el-table-column
+              width="140"
+              prop="userName"
+              label="发布人">
+            </el-table-column>
+            <el-table-column
+              prop="isDeleted"
+              :formatter = "stateFormat"
               width="70"
-              label="奖金">
+              label="当前状态">
             </el-table-column>
             <el-table-column
-              width="100"
-              label="启用时间">
-              <template slot-scope="scope">{{ scope.row.createDate | formatDate}}</template>
+              width="140"
+              label="最后操作时间">
+              <template slot-scope="scope">{{ scope.row.ut | formatDateTime}}</template>
             </el-table-column>
-            <el-table-column label="养老金" align="center">
-              <el-table-column
-                prop="pensionPer"
-                width="70"
-                label="比率">
-              </el-table-column>
-              <el-table-column
-                width="70"
-                prop="pensionBase"
-                label="基数">
-              </el-table-column>
+            <el-table-column
+              prop="up"
+              :formatter = "adminFormat"
+              width="70"
+              label="操作人">
             </el-table-column>
-            <el-table-column label="医疗保险" align="center">
-              <el-table-column
-                width="70"
-                prop="medicalPer"
-                label="比率">
-              </el-table-column>
-              <el-table-column
-                prop="medicalBase"
-                width="70"
-                label="基数">
-              </el-table-column>
-            </el-table-column>
-            <el-table-column label="公积金" align="center">
-              <el-table-column
-                width="70"
-                prop="accumulationFundPer"
-                label="比率">
-              </el-table-column>
-              <el-table-column
-                prop="accumulationFundBase"
-                width="70"
-                label="基数">
-              </el-table-column>
-            </el-table-column>
+
             <el-table-column label="操作" align="center">
-              <el-table-column label="编辑" align="center">
-                <template slot-scope="scope">
-                  <el-button
-                    size="mini"
-                    @click="handleEdit(scope.$index, scope.row)">编辑
-                  </el-button>
-                </template>
-              </el-table-column>
-              <el-table-column label="删除" align="center">
+              <el-table-column label="上下架" align="center">
                 <template slot-scope="scope">
                   <el-button
                     size="mini"
                     type="danger"
-                    @click="handleDelete(scope.$index, scope.row)">删除
+                    @click="handleDelete(scope.$index, scope.row)">上下架
                   </el-button>
                 </template>
               </el-table-column>
             </el-table-column>
           </el-table>
+          <div style="text-align: right;margin-top: 10px">
+            <el-pagination
+              background
+              @current-change="currentChange"
+              layout="prev, pager, next"
+              :total="totalCount">
+            </el-pagination>
+          </div>
         </div>
         <div style="text-align: left;margin-top: 10px" v-if="salaries!=0">
-          <el-button type="danger" round size="mini" :disabled="multipleSelection.length==0" @click="deleteAll">批量删除
+          <el-button type="danger" round size="mini" :disabled="multipleSelection.length==0" @click="deleteAll">批量上下架
           </el-button>
         </div>
       </el-main>
@@ -273,6 +259,9 @@
         index: 0,
         salaries: [],
         multipleSelection: [],
+        totalCount: -1,
+        currentPage: 1,
+
         salary: {
           id: '',
           createDate: '',
@@ -290,21 +279,37 @@
       };
     },
     methods: {
+      stateFormat(row, column) {
+        if (row.isDeleted === 0) {
+          return '已上架';
+        }
+        else if (row.isDeleted === 1) {
+          return '已下架'
+        }
+      },
+      adminFormat(row, column) {
+        if (row.up === "0") {
+          return '无';
+        }
+        else if (row.up === "1") {
+          return '管理员'
+        }
+      },
       deleteAll(){
-        this.$confirm('删除[' + this.multipleSelection.length + ']条记录, 是否继续?', '提示', {
+        this.$confirm('上下架[' + this.multipleSelection.length + ']条记录, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           var ids = '';
           this.multipleSelection.forEach(row=> {
-            ids = ids + row.id + ",";
+            ids = ids + row.answerId + ",";
           })
           this.doDelete(ids);
         }).catch(() => {
           this.$message({
             type: 'info',
-            message: '已取消删除'
+            message: '已取消上下架'
           });
         });
       },
@@ -318,27 +323,27 @@
         this.salary = row;
       },
       handleDelete(index, row) {
-        this.$confirm('删除[' + row.name + ']账套, 是否继续?', '提示', {
+        this.$confirm('上下架[' + row.title + ']回答, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          this.doDelete(row.id);
+          this.doDelete(row.answerId);
         }).catch(() => {
           this.$message({
             type: 'info',
-            message: '已取消删除'
+            message: '已取消上下架'
           });
         });
       },
       doDelete(id){
         var _this = this;
         _this.tableLoading = true;
-        this.deleteRequest("/salary/sob/salary/" + id).then(resp=>{
+        this.deleteRequest("/salary/sob/answer/" + id).then(resp=>{
           _this.tableLoading = false;
           if (resp && resp.status == 200) {
             var data = resp.data;
-           
+
             _this.loadSalaryCfg();
           }
         });
@@ -347,36 +352,36 @@
         var _this = this;
         if (this.index == 7) {
           if(this.salary.createDate&&this.salary.basicSalary&&this.salary.trafficSalary&&this.salary.lunchSalary&&this.salary.bonus&&this.salary.pensionBase&&this.salary.pensionPer&&this.salary.medicalBase&&this.salary.medicalPer&&this.salary.accumulationFundBase&&this.salary.accumulationFundPer){
-          if (this.salary.id) {//更新
-            _this.tableLoading = true;
-            this.putRequest("/salary/sob/salary", this.salary).then(resp=> {
-              _this.tableLoading = false;
-              if (resp && resp.status == 200) {
-                var data = resp.data;
-                _
-                _this.dialogVisible = false;
-                _this.index = 0;
-                _this.loadSalaryCfg();
-              }
-            });
-          } else {//添加
-            this.$prompt('请输入账套名称', '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消'
-            }).then(({value}) => {
-              this.salary.name = value;
-              this.postRequest("/salary/sob/salary", this.salary).then(resp=> {
+            if (this.salary.id) {//更新
+              _this.tableLoading = true;
+              this.putRequest("/salary/sob/salary", this.salary).then(resp=> {
+                _this.tableLoading = false;
                 if (resp && resp.status == 200) {
                   var data = resp.data;
-                  
+                  _
                   _this.dialogVisible = false;
                   _this.index = 0;
                   _this.loadSalaryCfg();
                 }
               });
-            }).catch(() => {
-            });
-          }
+            } else {//添加
+              this.$prompt('请输入账套名称', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消'
+              }).then(({value}) => {
+                this.salary.name = value;
+                this.postRequest("/salary/sob/salary", this.salary).then(resp=> {
+                  if (resp && resp.status == 200) {
+                    var data = resp.data;
+
+                    _this.dialogVisible = false;
+                    _this.index = 0;
+                    _this.loadSalaryCfg();
+                  }
+                });
+              }).catch(() => {
+              });
+            }
           }else{
             this.$message({type: 'error', message: '字段不能为空!'});
           }
@@ -384,13 +389,20 @@
           this.index++;
         }
       },
+      currentChange(currentPage){
+        this.currentPage = currentPage;
+        this.loadSalaryCfg();
+      },
       loadSalaryCfg(){
         this.tableLoading = true;
         var _this = this;
-        this.getRequest("/salary/sob/salary").then(resp=> {
+        this.getRequest("/salary/sob/answer?page=" + this.currentPage + "&size=10").then(resp=> {
           _this.tableLoading = false;
           if (resp && resp.status == 200) {
-            _this.salaries = resp.data;
+            var data = resp.data;
+            _this.salaries = data.emps;
+            _this.totalCount = data.count;
+            // _this.salaries = resp.data;
           }
         })
       },
