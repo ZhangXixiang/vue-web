@@ -103,6 +103,7 @@
             <el-step title="是否上架"></el-step>
             <el-step title="话题名称"></el-step>
             <el-step title="话题介绍"></el-step>
+            <el-step title="图标地址"></el-step>
           </el-steps>
           <div style="margin-left: 30px;display: flex;justify-content: center;align-items: center;width: 80%;">
             <div v-show="index==0">
@@ -118,14 +119,18 @@
             </div>
             <div v-show="index==1">
               是否上架：
-              <el-input
-                placeholder="请输入是否上架..."
-                @keyup.enter.native="next"
-                size="mini"
-                style="width: 200px"
-                type="number"
-                v-model="salary.isDeleted">
-              </el-input>
+<!--              <el-input-->
+<!--                placeholder="请输入是否上架..."-->
+<!--                @keyup.enter.native="next"-->
+<!--                size="mini"-->
+<!--                style="width: 200px"-->
+<!--                type="number"-->
+<!--                v-model="salary.isDeleted">-->
+<!--              </el-input>-->
+              <template>
+                <el-radio v-model="salary.isDeleted" label="0">上架</el-radio>
+                <el-radio v-model="salary.isDeleted" label="1">下架</el-radio>
+              </template>
             </div>
             <div v-show="index==2">
               话题名称：
@@ -142,18 +147,28 @@
               话题介绍：
               <el-input
                 placeholder="请输入话题介绍..."
-                size="mini"
                 @keyup.enter.native="next"
+                style="width: 400px"
+                type="textarea"
+                v-model="salary.content">
+              </el-input>
+            </div>
+            <div v-show="index==4">
+              图标地址：
+              <el-input
+                placeholder="请输入图标地址..."
+                @keyup.enter.native="next"
+                size="mini"
                 style="width: 200px"
                 type="text"
-                v-model="salary.content">
+                v-model="salary.icon">
               </el-input>
             </div>
           </div>
         </div>
         <div style="display: flex;align-items: center;justify-content: center;padding: 0px;margin: 0px;">
           <el-button round size="mini" v-if="index!=0" @click="index--">上一步</el-button>
-          <el-button type="primary" round size="mini" @click="next" v-text="index==3?'完成':'下一步'"></el-button>
+          <el-button type="primary" round size="mini" @click="next" v-text="index==4?'完成':'下一步'"></el-button>
         </div>
       </el-dialog>
     </div>
@@ -171,18 +186,20 @@
         currentPage: 1,
         multipleSelection: [],
         salary: {
-          id: '',
-          createDate: '',
-          basicSalary: '',
-          trafficSalary: '',
-          lunchSalary: '',
-          bonus: '',
-          pensionBase: '',
-          pensionPer: '',
-          medicalBase: '',
-          medicalPer: '',
-          accumulationFundBase: '',
-          accumulationFundPer: ''
+          //默认上架状态
+          isDeleted:"0",
+          // id: '',
+          // createDate: '',
+          // basicSalary: '',
+          // trafficSalary: '',
+          // lunchSalary: '',
+          // bonus: '',
+          // pensionBase: '',
+          // pensionPer: '',
+          // medicalBase: '',
+          // medicalPer: '',
+          // accumulationFundBase: '',
+          // accumulationFundPer: ''
         }
       };
     },
@@ -258,9 +275,10 @@
       },
       next(){
         var _this = this;
-        if (this.index == 3) {
+        if (this.index == 4) {
           // if(this.salary.createDate&&this.salary.basicSalary&&this.salary.trafficSalary&&this.salary.lunchSalary&&this.salary.bonus&&this.salary.pensionBase&&this.salary.pensionPer&&this.salary.medicalBase&&this.salary.medicalPer&&this.salary.accumulationFundBase&&this.salary.accumulationFundPer){
-          if(this.salary.sort&&this.salary.isDeleted&&this.salary.name&&this.salary.content){
+
+          if(this.salary.sort&&(this.salary.isDeleted.length != 0)&&this.salary.name&&this.salary.content){
             if (this.salary.id) {//更新
               _this.tableLoading = true;
               this.putRequest("/salary/sob/salary", this.salary).then(resp=> {
