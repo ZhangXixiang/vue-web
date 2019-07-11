@@ -113,7 +113,6 @@
                 size="mini"
                 style="width: 200px"
                 type="number"
-                @keyup.enter.native="next"
                 v-model="salary.sort">
               </el-input>
             </div>
@@ -136,7 +135,6 @@
               话题名称：
               <el-input
                 placeholder="请输入话题名称..."
-                @keyup.enter.native="next"
                 size="mini"
                 style="width: 200px"
                 type="text"
@@ -147,7 +145,6 @@
               话题介绍：
               <el-input
                 placeholder="请输入话题介绍..."
-                @keyup.enter.native="next"
                 style="width: 400px"
                 type="textarea"
                 v-model="salary.content">
@@ -157,7 +154,6 @@
               图标地址：
               <el-input
                 placeholder="请输入图标地址..."
-                @keyup.enter.native="next"
                 size="mini"
                 style="width: 200px"
                 type="text"
