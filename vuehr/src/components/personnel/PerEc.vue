@@ -159,6 +159,20 @@
                 type="text"
                 v-model="salary.icon">
               </el-input>
+              <el-upload
+                class="upload-demo"
+                :action="actionUrl"
+                :on-preview="handlePreview"
+                :on-remove="handleRemove"
+                :on-success="handleSuccess"
+                :before-remove="beforeRemove"
+                multiple
+                :limit="3"
+                :on-exceed="handleExceed"
+                :file-list="fileList">
+                <el-button size="small" type="primary">点击上传</el-button>
+                <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+              </el-upload>
             </div>
           </div>
         </div>
@@ -174,6 +188,7 @@
   export default {
     data() {
       return {
+        fileList: [],
         dialogVisible: false,
         tableLoading: false,
         index: 0,
@@ -184,6 +199,7 @@
         salary: {
           //默认上架状态
           isDeleted:"0",
+          icon:"",
           // id: '',
           // createDate: '',
           // basicSalary: '',
@@ -199,7 +215,31 @@
         }
       };
     },
+    computed: {
+      actionUrl(){
+        // let baseUrl = "//localhost:8082";
+        let baseUrl = "";
+        let resUrl = baseUrl +  "/salary/upload/upload"
+        return resUrl
+      }
+    },
     methods: {
+      handleRemove(file, fileList) {
+        console.log(file, fileList);
+      },
+      handlePreview(file) {
+        console.log(file);
+      },
+      handleExceed(files, fileList) {
+        this.$message.warning(`当前限制选择 3 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
+      },
+      beforeRemove(file, fileList) {
+        return this.$confirm(`确定移除 ${ file.name }？`);
+      },
+      handleSuccess(response, file, fileList){
+        console.log(response, file, fileList)
+        this.salary.icon = response.url;
+      },
       stateFormat(row, column) {
         if (row.isDeleted === 0) {
           return '已上架';
