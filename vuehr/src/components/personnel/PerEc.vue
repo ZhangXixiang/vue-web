@@ -118,14 +118,6 @@
             </div>
             <div v-show="index==1">
               是否上架：
-<!--              <el-input-->
-<!--                placeholder="请输入是否上架..."-->
-<!--                @keyup.enter.native="next"-->
-<!--                size="mini"-->
-<!--                style="width: 200px"-->
-<!--                type="number"-->
-<!--                v-model="salary.isDeleted">-->
-<!--              </el-input>-->
               <template>
                 <el-radio v-model="salary.isDeleted" label="0">上架</el-radio>
                 <el-radio v-model="salary.isDeleted" label="1">下架</el-radio>
@@ -168,8 +160,8 @@
                 :before-remove="beforeRemove"
                 multiple
                 :limit="3"
-                :on-exceed="handleExceed"
-                :file-list="fileList">
+                :on-exceed="handleExceed">
+<!--                :file-list="fileList">-->
                 <el-button size="small" type="primary">点击上传</el-button>
                 <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
               </el-upload>
@@ -198,7 +190,7 @@
         multipleSelection: [],
         salary: {
           //默认上架状态
-          isDeleted:"0",
+          isDeleted: "0",
           icon:"",
           // id: '',
           // createDate: '',
@@ -281,7 +273,8 @@
         this.dialogVisible = true;
         row.createDate = new Date(row.createDate);
         delete row.allSalary;
-        this.salary = row;
+        this.salary = {...row};
+        this.salary.isDeleted = this.salary.isDeleted+"";
       },
       handleDelete(index, row) {
         this.$confirm('上下架[' + row.name + ']话题, 是否继续?', '提示', {
