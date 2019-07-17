@@ -145,7 +145,7 @@
             <div v-show="index==4">
               图标地址：
               <el-input
-                placeholder="请输入图标地址..."
+                placeholder="请输入图标地址1..."
                 size="mini"
                 style="width: 200px"
                 type="text"
@@ -162,6 +162,28 @@
                 :limit="3"
                 :on-exceed="handleExceed">
 <!--                :file-list="fileList">-->
+                <el-button size="small" type="primary">点击上传</el-button>
+                <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+              </el-upload>
+
+              <el-input
+                placeholder="请输入图标地址2..."
+                size="mini"
+                style="width: 200px"
+                type="text"
+                v-model="salary.iconBlue">
+              </el-input>
+              <el-upload
+                class="upload-demo"
+                :action="actionUrl1"
+                :on-preview="handlePreview"
+                :on-remove="handleRemove"
+                :on-success="handleSuccess1"
+                :before-remove="beforeRemove"
+                multiple
+                :limit="3"
+                :on-exceed="handleExceed">
+                <!--                :file-list="fileList">-->
                 <el-button size="small" type="primary">点击上传</el-button>
                 <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
               </el-upload>
@@ -192,6 +214,7 @@
           //默认上架状态
           isDeleted: "0",
           icon:"",
+          iconBlue:"",
           // id: '',
           // createDate: '',
           // basicSalary: '',
@@ -209,9 +232,13 @@
     },
     computed: {
       actionUrl(){
-        // let baseUrl = "//localhost:8082";
         let baseUrl = "";
         let resUrl = baseUrl +  "/salary/upload/upload"
+        return resUrl
+      },
+      actionUrl1(){
+        let baseUrl = "";
+        let resUrl = baseUrl +  "/salary/upload/upload1"
         return resUrl
       }
     },
@@ -231,6 +258,10 @@
       handleSuccess(response, file, fileList){
         console.log(response, file, fileList)
         this.salary.icon = response.url;
+      },
+      handleSuccess1(response, file, fileList){
+        console.log(response, file, fileList)
+        this.salary.iconBlue = response.url;
       },
       stateFormat(row, column) {
         if (row.isDeleted === 0) {
